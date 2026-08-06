@@ -1,0 +1,7 @@
+build*/
+samples/
+__pycache__/
+.cache/
+.vscode/
+*.qcow2
+*.o
