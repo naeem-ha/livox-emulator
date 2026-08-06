@@ -60,6 +60,17 @@ SLAM host's `MID360_config.json` must list that IP in `lidar_configs[0].ip`. If 
 multi-homed, add `ip route add 255.255.255.255/32 dev <iface>` so the SDK's discovery
 broadcast leaves on the right interface.
 
+## Validation status
+
+All rings green as of 2026-08-06 (see [docs/TESTING.md](docs/TESTING.md)):
+
+| Ring | Setup | Result |
+|---|---|---|
+| unit tests | ctest | pass (incl. CRC KATs, golden frames, official-sample walk: 162k packages) |
+| host_sim, netns | WSL2 | pass, both sources: 2083.3-2083.5 pkt/s, 200.0 Hz IMU, gapless |
+| **stock ROS2 judge** | ros:humble + SDK2 v1.3.1 + driver 1.2.6, unmodified | **`/livox/lidar` 10.000 Hz (σ≈0.3 ms), `point_num`≈20k; `/livox/imu` 200.00 Hz** |
+| QEMU aarch64 guest | `virt`/cortex-a72 (TCG), bridge+tap | same as above, both sources, `--batch 1` sufficient |
+
 ## Repo layout
 
 | Path | What |

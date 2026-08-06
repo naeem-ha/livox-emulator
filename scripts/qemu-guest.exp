@@ -27,5 +27,7 @@ send "mkdir -p /payload && mount /dev/vdb /payload && ls /payload\r"
 expect -re "(#|\\$) $"
 send "/payload/livox_emulator [join $emuargs { }]\r"
 
-# Emulator runs until QEMU is killed; hand the console to the operator.
-interact
+# Emulator runs until QEMU is killed. Do NOT use interact here: with detached
+# stdin it returns on stdin-EOF and tears QEMU down. Wait for QEMU's eof.
+set timeout -1
+expect eof
