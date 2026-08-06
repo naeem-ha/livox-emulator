@@ -215,7 +215,7 @@ class StreamStats:
                 self.bad.append(f"short datagram {len(buf)}")
                 return
         (ver, length, _ti, dot, udp_cnt, _fc, dtype, ttype) = struct.unpack(
-            "<BHHHHBBB", buf[:11])
+            "<BHHHHBBB", buf[:12])
         if len(self.bad) < 5:
             if ver != 0:
                 self.bad.append(f"version {ver}")
