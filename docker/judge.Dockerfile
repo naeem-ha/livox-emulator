@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Livox-SDK2 (pinned release)
-RUN git clone --depth 1 --branch v1.2.5 https://github.com/Livox-SDK/Livox-SDK2.git /tmp/sdk2 \
+RUN git clone --depth 1 --branch v1.3.1 https://github.com/Livox-SDK/Livox-SDK2.git /tmp/sdk2 \
     && cmake -S /tmp/sdk2 -B /tmp/sdk2/build -DCMAKE_BUILD_TYPE=Release \
     && cmake --build /tmp/sdk2/build -j"$(nproc)" \
     && cmake --install /tmp/sdk2/build \
@@ -14,7 +14,7 @@ RUN git clone --depth 1 --branch v1.2.5 https://github.com/Livox-SDK/Livox-SDK2.
 
 # livox_ros_driver2 (pinned release), built unmodified via its own build.sh
 RUN mkdir -p /ws_livox/src \
-    && git clone --depth 1 --branch 1.2.4 https://github.com/Livox-SDK/livox_ros_driver2.git \
+    && git clone --depth 1 --branch 1.2.6 https://github.com/Livox-SDK/livox_ros_driver2.git \
        /ws_livox/src/livox_ros_driver2
 RUN cd /ws_livox/src/livox_ros_driver2 \
     && bash -c "source /opt/ros/humble/setup.bash && ./build.sh humble"

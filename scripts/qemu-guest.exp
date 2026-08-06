@@ -1,0 +1,31 @@
+#!/usr/bin/env expect
+# Boots the stage-2 QEMU guest and drives the serial console: root login
+# (Debian nocloud images have no root password), static IP 192.168.77.12,
+# mount the payload disk, launch the emulator. Keeps QEMU in the foreground.
+#
+# Usage: expect scripts/qemu-guest.exp <qcow2> [emulator args...]
+#   default emulator args: --ip 192.168.77.12 --source synthetic
+
+set timeout 600
+set img [lindex $argv 0]
+if {$img eq ""} { puts "usage: qemu-guest.exp <qcow2> [emulator args...]"; exit 2 }
+set emuargs [lrange $argv 1 end]
+if {[llength $emuargs] == 0} { set emuargs {--ip 192.168.77.12 --source synthetic} }
+
+set dir [file dirname [info script]]
+spawn bash $dir/run-qemu.sh $img
+
+expect {
+    -re "login: $" {}
+    timeout { puts "\nERROR: no login prompt within 10 min"; exit 1 }
+}
+send "root\r"
+expect -re "(#|\\$) $"
+send "NIC=\$(ls /sys/class/net | grep -v '^lo' | head -1); ip addr add 192.168.77.12/24 dev \$NIC; ip link set \$NIC up; ip -brief addr\r"
+expect -re "(#|\\$) $"
+send "mkdir -p /payload && mount /dev/vdb /payload && ls /payload\r"
+expect -re "(#|\\$) $"
+send "/payload/livox_emulator [join $emuargs { }]\r"
+
+# Emulator runs until QEMU is killed; hand the console to the operator.
+interact

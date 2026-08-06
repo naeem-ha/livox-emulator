@@ -10,16 +10,21 @@
 #   mkdir -p /mnt/repo && mount -t 9p -o trans=virtio,version=9p2000.L hostshare /mnt/repo
 #   /mnt/repo/build-aarch64/livox_emulator --ip 192.168.77.12
 set -euo pipefail
-IMG="${1:?usage: run-qemu.sh <debian-arm64.qcow2>}"
+IMG="${1:?usage: run-qemu.sh <debian-arm64.qcow2> [payload.img]}"
+PAYLOAD="${2:-/root/qemu/payload.img}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 
 BIOS=/usr/share/AAVMF/AAVMF_CODE.fd
 [ -f "$BIOS" ] || BIOS=/usr/share/qemu-efi-aarch64/QEMU_EFI.fd
 
+EXTRA=()
+[ -f "$PAYLOAD" ] && EXTRA+=(-drive "if=virtio,format=raw,file=$PAYLOAD")
+
 exec qemu-system-aarch64 \
   -machine virt -cpu cortex-a72 -smp 4 -m 2048 \
   -bios "$BIOS" \
   -drive if=virtio,format=qcow2,file="$IMG" \
+  "${EXTRA[@]}" \
   -device virtio-net-pci,netdev=n0,mac=52:54:00:77:00:12 \
   -netdev tap,id=n0,ifname=tap0,script=no,downscript=no \
   -virtfs "local,path=$REPO,mount_tag=hostshare,security_model=none,id=hostshare" \
