@@ -1,0 +1,4 @@
+* text=auto eol=lf
+*.pdf binary
+*.lvx2 binary
+*.qcow2 binary
