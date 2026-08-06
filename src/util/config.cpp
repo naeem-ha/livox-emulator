@@ -13,7 +13,7 @@ void print_usage(const char* prog) {
                "  --ip <addr>          lidar IP to report/bind (default 192.168.77.12)\n"
                "  --netmask <addr>     reported netmask (default 255.255.255.0)\n"
                "  --gateway <addr>     reported gateway (default 192.168.77.1)\n"
-               "  --sn <str>           serial number, <=16 chars (default MID360EMU0000001)\n"
+               "  --sn <str>           serial number, <=15 chars (default MID360EMU00001)\n"
                "  --source <name>      point source: synthetic | lvx2 (default synthetic)\n"
                "  --lvx2 <path>        .lvx2 file to replay (required for --source lvx2)\n"
                "  --batch <n>          point packets per send burst, 1-32 (default 1)\n"
@@ -58,8 +58,9 @@ std::optional<Config> parse_args(int argc, char** argv, std::string& err) {
       return std::nullopt;
     }
   }
-  if (cfg.sn.size() > 16) {
-    err = "--sn must be at most 16 characters";
+  if (cfg.sn.size() > 15) {
+    // 16 chars fit the wire field but crash Livox-SDK2's unterminated strcpy.
+    err = "--sn must be at most 15 characters (SDK2 requires a NUL in sn[16])";
     return std::nullopt;
   }
   if (cfg.source != "synthetic" && cfg.source != "lvx2") {

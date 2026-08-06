@@ -9,7 +9,11 @@ struct Config {
   std::string lidar_ip = "192.168.77.12";
   std::string netmask = "255.255.255.0";
   std::string gateway = "192.168.77.1";
-  std::string sn = "MID360EMU0000001";  // 16 chars max, zero-padded on the wire
+  // Max 15 chars: the wire field is char[16], but Livox-SDK2 strcpy's it into
+  // a 16-byte buffer — a 16-char SN has no NUL and crashes the stock driver
+  // (fortify abort in GeneralCommandHandler::LivoxLidarInfoChange). Real
+  // Mid-360 serials are 14 chars.
+  std::string sn = "MID360EMU00001";
   std::string source = "synthetic";     // "synthetic" | "lvx2"
   std::string lvx2_path;
   unsigned batch = 1;      // point packets per sendmmsg burst (QEMU/TCG mitigation)

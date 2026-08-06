@@ -173,8 +173,10 @@ void ControlPlane::on_param_write_(UdpSocket& sock, const CtrlFrame& req,
         LOG_INFO("imu_data_en = %u", st_.imu_data_en);
         break;
       case kKeyInstallAttitude:
-        std::memcpy(st_.install_attitude.data(), kv.value.data(),
-                    kv.value.size() > 24 ? 24 : kv.value.size());
+        if (!kv.value.empty()) {
+          std::memcpy(st_.install_attitude.data(), kv.value.data(),
+                      kv.value.size() > 24 ? 24 : kv.value.size());
+        }
         LOG_INFO("install_attitude stored (%zu bytes)", kv.value.size());
         break;
       default:

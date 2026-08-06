@@ -16,8 +16,18 @@ RUN git clone --depth 1 --branch v1.3.1 https://github.com/Livox-SDK/Livox-SDK2.
 RUN mkdir -p /ws_livox/src \
     && git clone --depth 1 --branch 1.2.6 https://github.com/Livox-SDK/livox_ros_driver2.git \
        /ws_livox/src/livox_ros_driver2
+# The slim ros:humble base lacks PCL. rosdep can't see the ROS2 deps either:
+# the repo ships a ROS1 package.xml and build.sh swaps in package_ROS2.xml only
+# at build time — so install the ROS2 build deps explicitly.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+       libpcl-dev ros-humble-pcl-conversions \
+    && rm -rf /var/lib/apt/lists/*
+# build.sh does not propagate colcon failures; assert the real install outputs.
 RUN cd /ws_livox/src/livox_ros_driver2 \
-    && bash -c "source /opt/ros/humble/setup.bash && ./build.sh humble"
+    && bash -c "source /opt/ros/humble/setup.bash && ./build.sh humble" \
+    && find /ws_livox/install -name msg_MID360_launch.py | grep -q . \
+    && find /ws_livox/install -name MID360_config.json | grep -q .
 
 COPY judge-entry.sh /judge-entry.sh
 RUN chmod +x /judge-entry.sh

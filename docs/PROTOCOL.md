@@ -68,6 +68,11 @@ u16 crc16_h           u32 crc32_d           u8 data[]
   delivered to unicast-bound sockets.
 - On a multi-homed host, `255.255.255.255` routes out the default interface; the harness
   adds `ip route add 255.255.255.255/32 dev <iface>` to pin it.
+- **The serial number must be ≤ 15 chars.** The wire field is `char sn[16]`, but the SDK
+  `strcpy`s it into a 16-byte buffer (`GeneralCommandHandler::LivoxLidarInfoChange`); a
+  16-char SN leaves no NUL and aborts the stock driver with `*** buffer overflow
+  detected ***` (found the hard way — real Mid-360 serials are 14 chars, so the latent
+  bug never fires on hardware).
 
 ## Data plane (36 B header + payload)
 
