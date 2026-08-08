@@ -36,9 +36,7 @@ cannot see our veth/bridge. `scripts/run-judge.sh` refuses it.
 # emulator still running in the netns as above
 bash scripts/run-judge.sh                     # builds image on first run, then launches driver
 # in another terminal:
-docker exec -it $(docker ps -q -f ancestor=livox-judge) bash -lc \
-  'source /opt/ros/humble/setup.bash && source /ws_livox/install/setup.bash && \
-   ros2 topic hz /livox/lidar & ros2 topic hz /livox/imu & sleep 15; kill %1 %2'
+bash scripts/measure-judge.sh                 # hz for both topics + point_num + topic list
 ```
 
 **Pass criterion (the project's definition of done):** `/livox/lidar` ≈ 10 Hz with
